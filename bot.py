@@ -138,6 +138,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(gpt_answer)
 
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
     log_line = (
         f"[{timestamp}]\n"
         f"User: {user_name} (ID: {user_id})\n"
@@ -145,8 +146,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Bot Reply: {gpt_answer}\n"
         f"------------------------\n"
     )
-    with open("log.txt", "a", encoding="utf-8") as log_file:
-        log_file.write(log_line)
+    logging.DEBUG(log_line)
 
 def main():
     application = ApplicationBuilder().token(BOT_TOKEN).build()
