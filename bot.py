@@ -19,18 +19,25 @@ except FileNotFoundError:
     character_data = {}
     logging.warning(f"Файл {JSON_FILE} не найден! Использую пустые данные.")
 
-# Извлекаем поля (bio, lore, и т.п.)
+# Извлекаем поля (bio, lore)
 bot_bio_list = character_data.get("bio", [])
 bot_lore_list = character_data.get("lore", [])
-bot_bio  = "\n".join(bot_bio_list)
-bot_lore = "\n".join(bot_lore_list)
+bot_bio = "\n".join(bot_bio_list) if isinstance(bot_bio_list, list) else str(bot_bio_list)
+bot_lore = "\n".join(bot_lore_list) if isinstance(bot_lore_list, list) else str(bot_lore_list)
 
-# 2. Ключи и токены
-OPENROUTER_API_KEY = os.getenv("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") or "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"
-BOT_TOKEN = os.getenv("7695493113:AAFgHL-TTAEGAEmRa_qwzA_P4WZ_2oD8qiU") or "7695493113:AAFgHL-TTAEGAEmRa_qwzA_P4WZ_2oD8qiU"
+# 2. Считываем ключи из переменных окружения
+OPENROUTER_API_KEY = ("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")
+if not OPENROUTER_API_KEY:
+    raise ValueError("Не установлен OPENROUTER_API_KEY в переменных окружения.")
+
+BOT_TOKEN = ("7695493113:AAFgHL-TTAEGAEmRa_qwzA_P4WZ_2oD8qiU")
+if not BOT_TOKEN:
+    raise ValueError("Не установлен BOT_TOKEN в переменных окружения.")
+
+# 3. URL OpenRouter
 OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
-# 3. Формируем system prompt, включая данные из JSON
+# 4. Формируем system prompt, включая данные из JSON
 SYSTEM_PROMPT = f"""\
 You are NoRugToken, a crypto project focusing on security and transparency.
 
@@ -47,13 +54,14 @@ Rules:
 """
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Если в JSON есть greeting, используем
+    # Если в JSON есть greeting, используем его
     greeting = character_data.get("greeting", "Hello, I'm NoRugToken Bot!")
     await update.message.reply_text(greeting)
 
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_text = update.message.text
 
+    # Формируем тело POST-запроса
     payload = {
         "model": "openai/gpt-3.5-turbo",
         "messages": [
@@ -61,9 +69,10 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             {"role": "user", "content": user_text}
         ],
         "max_tokens": 200,
-        "temperature": 0.1  # Низкое значение, чтобы не фантазировал
+        "temperature": 0.1
     }
 
+    # Заголовки
     headers = {
         "Content-Type": "application/json",
         "Authorization": f"Bearer {OPENROUTER_API_KEY}",
