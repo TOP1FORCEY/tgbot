@@ -19,7 +19,7 @@ except FileNotFoundError:
     character_data = {}
     logging.warning(f"Файл {JSON_FILE} не найден! Использую пустые данные.")
 
-# Извлекаем поля (bio, lore)
+# Извлекаем поля (bio and lore)
 bot_bio_list = character_data.get("bio", [])
 bot_lore_list = character_data.get("lore", [])
 bot_bio = "\n".join(bot_bio_list) if isinstance(bot_bio_list, list) else str(bot_bio_list)
