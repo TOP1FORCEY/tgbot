@@ -17,9 +17,6 @@ logging.basicConfig(
     level=logging.INFO
 )
 
-# ----------------------------
-# 1. Чтение character.json
-# ----------------------------
 JSON_FILE = "character.json"
 try:
     with open(JSON_FILE, "r", encoding="utf-8") as f:
@@ -28,7 +25,6 @@ except FileNotFoundError:
     character_data = {}
     logging.warning(f"Файл {JSON_FILE} не найден! Используем пустые данные.")
 
-# Извлекаем поля (если нет поля, используем пустой список/словарь/строку)
 bot_name = character_data.get("name", "NoRugToken")
 clients = character_data.get("clients", [])
 model_provider = character_data.get("modelProvider", "openai")
@@ -40,34 +36,24 @@ style_info = character_data.get("style", {})
 adjectives = character_data.get("adjectives", [])
 mentions = character_data.get("mentions", [])
 
-# Превращаем списки в строки для удобства
 bio_str = "\n".join(bio_list)
 lore_str = "\n".join(lore_list)
 knowledge_str = "\n".join(knowledge) if isinstance(knowledge, list) else str(knowledge)
 topics_str = "\n".join(topics)
 adjectives_str = ", ".join(adjectives)
 
-# Style может иметь разные секции (all, chat, post)
 style_all_list = style_info.get("all", [])
 style_chat_list = style_info.get("chat", [])
-# Превращаем их в строки
 style_all_str = "\n".join(style_all_list)
 style_chat_str = "\n".join(style_chat_list)
 
-# ----------------------------
-# 2. Ключи и токены
-# ----------------------------
-# В реальном проекте лучше хранить их в переменных окружения, а не в коде
 OPENROUTER_API_KEY = os.getenv("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", "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")
 BOT_TOKEN = os.getenv("7695493113:AAFgHL-TTAEGAEmRa_qwzA_P4WZ_2oD8qiU", "7695493113:AAFgHL-TTAEGAEmRa_qwzA_P4WZ_2oD8qiU")
 
-# OpenRouter endpoint
 OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
-# ----------------------------
-# 3. Формируем общий System Prompt
-# ----------------------------
-# Здесь мы объединим все поля (bio, lore, style, topics, etc.) в один большой контекст.
+
+# ----------------------------System Prompt----------------------------
 SYSTEM_PROMPT = f"""
 You are {bot_name}, a crypto project focusing on security and transparency.
 
@@ -99,11 +85,7 @@ Rules:
 4. Answer in a friendly and concise manner, unless the user asks for more detail.
 """
 
-KEYWORDS = mentions
-
-# ----------------------------
-# 4. /start Команда
-# ----------------------------
+# ----------------------------START----------------------------
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     greeting = "Hello, I'm NoRugToken Bot! Ask me anything."
     # Если в character.json есть какое-то приветствие
@@ -113,9 +95,6 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(greeting)
 
-# ----------------------------
-# 5. Обработчик сообщений
-# ----------------------------
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.message
     if not message:
@@ -125,28 +104,21 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_name = update.effective_user.full_name if update.effective_user else "Unknown User"
     user_id = update.effective_user.id if update.effective_user else "Unknown ID"
 
-    # Получаем имя пользователя бота
     bot_username = (await context.bot.get_me()).username
     if not bot_username:
         logging.error("Не удалось получить имя пользователя бота.")
         return
 
-    # Проверяем, упомянут ли бот в сообщении (без учёта регистра)
     if not any(f"@{bot_username.lower()}" in user_text.lower() for bot_username in [bot_username]):
-        # Если хотите, чтобы бот отвечал на все сообщения, раскомментируйте следующую строку
-        # pass
-        # Иначе игнорируем сообщение
         return
-
-    # Формируем запрос к OpenRouter
     payload = {
-        "model": "openai/gpt-3.5-turbo",  # Или другую, если у вас есть доступ
+        "model": "openai/gpt-3.5-turbo",  
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user_text}
         ],
         "max_tokens": 500,
-        "temperature": 0.3  # немного креативности
+        "temperature": 0.3  # налаштування креативності відповідей від 0.0 до 1.0
     }
     headers = {
         "Content-Type": "application/json",
@@ -163,10 +135,8 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logging.error(f"OpenRouter API error: {e}")
         gpt_answer = "Sorry, an error occurred while fetching data from OpenRouter."
 
-    # Отправляем ответ
     await update.message.reply_text(gpt_answer)
 
-    # Логирование в файл (при желании)
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     log_line = (
         f"[{timestamp}]\n"
@@ -178,9 +148,6 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     with open("log.txt", "a", encoding="utf-8") as log_file:
         log_file.write(log_line)
 
-# ----------------------------
-# 6. Запуск бота
-# ----------------------------
 def main():
     application = ApplicationBuilder().token(BOT_TOKEN).build()
     application.add_handler(CommandHandler("start", start_command))
