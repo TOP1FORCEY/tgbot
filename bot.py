@@ -26,7 +26,7 @@ bot_bio  = "\n".join(bot_bio_list)
 bot_lore = "\n".join(bot_lore_list)
 
 # 2. Ключи и токены
-OPENROUTER_API_KEY = os.getenv("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") or "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"
+OPENROUTER_API_KEY = os.getenv("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") or "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"
 BOT_TOKEN = os.getenv("7695493113:AAFgHL-TTAEGAEmRa_qwzA_P4WZ_2oD8qiU") or "7695493113:AAFgHL-TTAEGAEmRa_qwzA_P4WZ_2oD8qiU"
 OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
