@@ -146,7 +146,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Bot Reply: {gpt_answer}\n"
         f"------------------------\n"
     )
-    logging.DEBUG(log_line)
+    logging.debug(msg=log_line)
 
 def main():
     application = ApplicationBuilder().token(BOT_TOKEN).build()
