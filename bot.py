@@ -140,13 +140,12 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     
     log_line = (
-        f"[{timestamp}]\n"
+        f"[\n{timestamp}]\n"
         f"User: {user_name} (ID: {user_id})\n"
         f"Message: {user_text}\n"
-        f"Bot Reply: {gpt_answer}\n"
-        f"------------------------\n"
+        f"Bot Reply: {gpt_answer}"
     )
-    logging.debug(msg=str(log_line))
+    logging.info(str(log_line))
 
 def main():
     application = ApplicationBuilder().token(BOT_TOKEN).build()
