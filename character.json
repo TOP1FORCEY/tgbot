@@ -55,6 +55,7 @@
     "NoRugToken",
     "NoRug",
     "NRT",
-    "token"
+    "token",
+    "project"
   ]
 }

@@ -53,7 +53,7 @@ BOT_TOKEN = os.getenv("7695493113:AAFgHL-TTAEGAEmRa_qwzA_P4WZ_2oD8qiU", "7695493
 OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 
-# ----------------------------System Prompt----------------------------
+# ----------------------------System Prompt-----------------------------
 SYSTEM_PROMPT = f"""
 You are {bot_name}, a crypto project focusing on security and transparency.
 
