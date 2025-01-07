@@ -3,7 +3,7 @@ import json
 import requests
 import logging
 from datetime import datetime
-from telegram import Update
+from telegram import Update, Chat
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
@@ -58,8 +58,8 @@ style_chat_str = "\n".join(style_chat_list)
 # 2. Ключи и токены
 # ----------------------------
 # В реальном проекте лучше хранить их в переменных окружения, а не в коде
-OPENROUTER_API_KEY = "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"
-BOT_TOKEN = "7695493113:AAFgHL-TTAEGAEmRa_qwzA_P4WZ_2oD8qiU"
+OPENROUTER_API_KEY = os.getenv("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", "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")
+BOT_TOKEN = os.getenv("7695493113:AAFgHL-TTAEGAEmRa_qwzA_P4WZ_2oD8qiU", "7695493113:AAFgHL-TTAEGAEmRa_qwzA_P4WZ_2oD8qiU")
 
 # OpenRouter endpoint
 OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
@@ -99,8 +99,7 @@ Rules:
 4. Answer in a friendly and concise manner, unless the user asks for more detail.
 """
 
-
-KEYWORDS = mentions  
+KEYWORDS = mentions
 
 # ----------------------------
 # 4. /start Команда
@@ -118,14 +117,26 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 # 5. Обработчик сообщений
 # ----------------------------
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user_text = update.message.text
+    message = update.message
+    if not message:
+        return
+
+    user_text = message.text
     user_name = update.effective_user.full_name if update.effective_user else "Unknown User"
     user_id = update.effective_user.id if update.effective_user else "Unknown ID"
 
-    # Пример: Если хотим отвечать только при наличии определённых слов:
-    # lower_text = user_text.lower()
-    # if not any(kw in lower_text for kw in KEYWORDS):
-    #     return  # игнорируем, если нет слов
+    # Получаем имя пользователя бота
+    bot_username = (await context.bot.get_me()).username
+    if not bot_username:
+        logging.error("Не удалось получить имя пользователя бота.")
+        return
+
+    # Проверяем, упомянут ли бот в сообщении (без учёта регистра)
+    if not any(f"@{bot_username.lower()}" in user_text.lower() for bot_username in [bot_username]):
+        # Если хотите, чтобы бот отвечал на все сообщения, раскомментируйте следующую строку
+        # pass
+        # Иначе игнорируем сообщение
+        return
 
     # Формируем запрос к OpenRouter
     payload = {
