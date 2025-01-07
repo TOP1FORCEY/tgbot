@@ -137,7 +137,15 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     await update.message.reply_text(gpt_answer)
 
-    log_line = (f"\n\n{datetime.now().strftime("%Y-%m-%d %H:%M:%S")}\nUser: {user_name} (ID: {user_id})\nMessage: {user_text}\nBot Reply: {gpt_answer}\n")
+    log_line = (
+    
+    f"\n\n{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+    f"User: {user_name} (ID: {user_id})\n"
+    f"Message: {user_text}\n"
+    f"Bot Reply: {gpt_answer}\n"
+    
+    )
+
     
     logging.info(str(log_line))
 
