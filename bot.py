@@ -106,7 +106,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     bot_username = (await context.bot.get_me()).username
     if not bot_username:
-        logging.error("Не удалось получить имя пользователя бота.")
+        logging.error("Name error.")
         return
 
     if not any(f"@{bot_username.lower()}" in user_text.lower() for bot_username in [bot_username]):
@@ -146,7 +146,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Bot Reply: {gpt_answer}\n"
         f"------------------------\n"
     )
-    logging.debug(msg=log_line)
+    logging.debug(msg=str(log_line))
 
 def main():
     application = ApplicationBuilder().token(BOT_TOKEN).build()
