@@ -86,15 +86,6 @@ Rules:
 """
 
 # ----------------------------START----------------------------
-async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    greeting = "Hello, I'm NoRugToken Bot! Ask me anything."
-    # Если в character.json есть какое-то приветствие
-    custom_greeting = character_data.get("greeting", "")
-    if custom_greeting:
-        greeting = custom_greeting
-
-    await update.message.reply_text(greeting)
-
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.message
     if not message:
@@ -104,21 +95,31 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_name = update.effective_user.full_name if update.effective_user else "Unknown User"
     user_id = update.effective_user.id if update.effective_user else "Unknown ID"
 
+    chat_type = update.effective_chat.type  # Check the type of chat
     bot_username = (await context.bot.get_me()).username
+
     if not bot_username:
-        logging.error("Name error.")
+        logging.error("Bot username error.")
         return
 
-    if not any(f"@{bot_username.lower()}" in user_text.lower() for bot_username in [bot_username]):
+    # Respond to all messages in private chats
+    if chat_type == Chat.PRIVATE:
+        should_respond = True
+    else:
+        # Respond only if bot is mentioned in group chats
+        should_respond = any(f"@{bot_username.lower()}" in user_text.lower() for bot_username in [bot_username])
+
+    if not should_respond:
         return
+
     payload = {
-        "model": "openai/gpt-3.5-turbo",  
+        "model": "openai/gpt-3.5-turbo",
         "messages": [
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user_text}
         ],
         "max_tokens": 500,
-        "temperature": 0.3  # налаштування креативності відповідей від 0.0 до 1.0
+        "temperature": 0.3  # Adjust creativity level
     }
     headers = {
         "Content-Type": "application/json",
@@ -135,27 +136,15 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logging.error(f"OpenRouter API error: {e}")
         gpt_answer = "Sorry, an error occurred while fetching data from OpenRouter."
 
-    await update.message.reply_text(gpt_answer)
+    await message.reply_text(gpt_answer)
 
     time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    
+
     log_line = (
-    
-    f"\n\n{time}\n"
-    f"User: {user_name} (ID: {user_id})\n"
-    f"Message: {user_text}\n"
-    f"Bot Reply: {gpt_answer}\n"
-    
+        f"\n\n{time}\n"
+        f"User: {user_name} (ID: {user_id})\n"
+        f"Message: {user_text}\n"
+        f"Bot Reply: {gpt_answer}\n"
     )
 
-    
     logging.info(str(log_line))
-
-def main():
-    application = ApplicationBuilder().token(BOT_TOKEN).build()
-    application.add_handler(CommandHandler("start", start_command))
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
-    application.run_polling()
-
-if __name__ == "__main__":
-    main()
