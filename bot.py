@@ -23,9 +23,9 @@ try:
         character_data = json.load(f)
 except FileNotFoundError:
     character_data = {}
-    logging.warning(f"Файл {JSON_FILE} не найден! Используем пустые данные.")
+    logging.warning(f"Файл {JSON_FILE} відсутній!")
 
-bot_name = character_data.get("name", "NoRugToken")
+bot_name = character_data.get("name", [])
 clients = character_data.get("clients", [])
 bio_list = character_data.get("bio", [])
 lore_list = character_data.get("lore", [])
@@ -90,9 +90,6 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.message
     if not message:
         return
-    if message.text == "/start":
-        await message.reply_text(introduction)
-        return
 
     user_text = message.text
     user_name = update.effective_user.full_name if update.effective_user else "Unknown User"
@@ -106,11 +103,9 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logging.error("Bot username error.")
         return
 
-    # Respond logic: respond in private chats or if mentioned in group chats
     if chat_type == Chat.PRIVATE:
         should_respond = True
     else:
-        # Respond only if bot is mentioned in group chats
         should_respond = f"@{bot_username.lower()}" in user_text.lower()
 
     if not should_respond:
@@ -122,8 +117,8 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user_text}
         ],
-        "max_tokens": 500,
-        "temperature": 0.3  # Adjust creativity level
+        "max_tokens": 500,  #  К-кість токенів
+        "temperature": 0.3  # Креативність
     }
     headers = {
         "Content-Type": "application/json",
@@ -155,9 +150,13 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     logging.info(str(log_line))
 
+async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text(introduction)
+
 def main():
     application = ApplicationBuilder().token(BOT_TOKEN).build()
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
+    application.add_handler(CommandHandler('start', start_handler))
     application.run_polling()
 
 if __name__ == "__main__":
