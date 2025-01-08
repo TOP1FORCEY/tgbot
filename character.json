@@ -1,6 +1,6 @@
 {
-  "BOT_TOKEN": "7695493113:AAFgHL-TTAEGAEmRa_qwzA_P4WZ_2oD8qiU",
-  "OPENROUTER_API_KEY": "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",
+  "BOT_TOKEN": "8018454966:AAEwF0t1ImhOLvVdQyzWcsSqvMbKI13rnTc",
+  "OPENROUTER_API_KEY": "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",
   "name": "NoRugToken",
   "clients": [
     "telegram"
