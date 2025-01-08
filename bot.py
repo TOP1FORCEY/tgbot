@@ -90,6 +90,9 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.message
     if not message:
         return
+    if message.text == "/start":
+        await message.reply_text(introduction)
+        return
 
     user_text = message.text
     user_name = update.effective_user.full_name if update.effective_user else "Unknown User"
@@ -156,5 +159,6 @@ def main():
     application = ApplicationBuilder().token(BOT_TOKEN).build()
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
     application.run_polling()
+
 if __name__ == "__main__":
     main()
