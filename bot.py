@@ -142,6 +142,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
     log_line = (
+        
         f"\n\n{time}\n"
         f"In chat: {chat_id} (type: {chat_type})\n"
         f"User: {user_name} (ID: {user_id})\n"
@@ -151,3 +152,9 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     logging.info(str(log_line))
 
+def main():
+    application = ApplicationBuilder().token(BOT_TOKEN).build()
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
+    application.run_polling()
+if __name__ == "__main__":
+    main()
