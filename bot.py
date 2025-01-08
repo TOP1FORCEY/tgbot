@@ -47,8 +47,8 @@ style_chat_list = style_info.get("chat", [])
 style_all_str = "\n".join(style_all_list)
 style_chat_str = "\n".join(style_chat_list)
 
-OPENROUTER_API_KEY = os.getenv("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", "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")
-BOT_TOKEN = os.getenv("7695493113:AAFgHL-TTAEGAEmRa_qwzA_P4WZ_2oD8qiU", "7695493113:AAFgHL-TTAEGAEmRa_qwzA_P4WZ_2oD8qiU")
+OPENROUTER_API_KEY = character_data.get("OPENROUTER_API_KEY", [])
+BOT_TOKEN = character_data.get("BOT_TOKEN", [])
 
 OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
