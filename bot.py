@@ -27,14 +27,14 @@ except FileNotFoundError:
 
 bot_name = character_data.get("name", "NoRugToken")
 clients = character_data.get("clients", [])
-model_provider = character_data.get("modelProvider", "openai")
 bio_list = character_data.get("bio", [])
 lore_list = character_data.get("lore", [])
 knowledge = character_data.get("knowledge", [])
 topics = character_data.get("topics", [])
 style_info = character_data.get("style", {})
 adjectives = character_data.get("adjectives", [])
-mentions = character_data.get("mentions", [])
+
+introduction = character_data.get("introduction", [])
 
 bio_str = "\n".join(bio_list)
 lore_str = "\n".join(lore_list)
