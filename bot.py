@@ -102,12 +102,12 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         logging.error("Bot username error.")
         return
 
-    # Respond to all messages in private chats
+    # Respond logic: respond in private chats or if mentioned in group chats
     if chat_type == Chat.PRIVATE:
         should_respond = True
     else:
         # Respond only if bot is mentioned in group chats
-        should_respond = any(f"@{bot_username.lower()}" in user_text.lower() for bot_username in [bot_username])
+        should_respond = f"@{bot_username.lower()}" in user_text.lower()
 
     if not should_respond:
         return
@@ -148,3 +148,4 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
 
     logging.info(str(log_line))
+
