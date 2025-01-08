@@ -94,8 +94,9 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_text = message.text
     user_name = update.effective_user.full_name if update.effective_user else "Unknown User"
     user_id = update.effective_user.id if update.effective_user else "Unknown ID"
-
-    chat_type = update.effective_chat.type  # Check the type of chat
+    chat_id = update.effective_chat.id
+    chat_type = update.effective_chat.type
+    
     bot_username = (await context.bot.get_me()).username
 
     if not bot_username:
@@ -142,6 +143,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     log_line = (
         f"\n\n{time}\n"
+        f"In chat: {chat_id} (type: {chat_type})\n"
         f"User: {user_name} (ID: {user_id})\n"
         f"Message: {user_text}\n"
         f"Bot Reply: {gpt_answer}\n"
