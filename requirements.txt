@@ -1,2 +1,2 @@
-discrod.py
+discrod
 requests
