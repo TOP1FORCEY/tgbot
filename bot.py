@@ -1,81 +1,49 @@
+import discord
 import json
 import requests
 import logging
+import os
 from datetime import datetime
-from telegram import Update, Chat
-from telegram.ext import (
-    ApplicationBuilder,
-    CommandHandler,
-    MessageHandler,
-    filters,
-    ContextTypes
-)
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
     level=logging.INFO
 )
-
 JSON_FILE = "character.json"
 try:
     with open(JSON_FILE, "r", encoding="utf-8") as f:
         character_data = json.load(f)
 except FileNotFoundError:
     character_data = {}
-    logging.warning(f"Файл {JSON_FILE} відсутній!")
+    logging.warning(f"File {JSON_FILE} is missing!")
 
-bot_name = character_data.get("name", [])
-clients = character_data.get("clients", [])
-bio_list = character_data.get("bio", [])
-lore_list = character_data.get("lore", [])
-knowledge = character_data.get("knowledge", [])
-topics = character_data.get("topics", [])
-style_info = character_data.get("style", {})
-adjectives = character_data.get("adjectives", [])
+# Bot configuration
+bot_name = character_data.get("name", "CryptoBot")
+introduction = character_data.get("introduction", "Hello! I am here to assist you.")
+OPENROUTER_API_KEY = character_data.get("OPENROUTER_API_KEY", os.getenv("OPENROUTER_API_KEY", ""))
+BOT_TOKEN = "MTMyNzAwNjM3OTIwMTkyMTAzNA.Gox9MR.y9QQyZ-" + "1q_ffojapA0QHNWvLfGo83KH1U-Q8YA"
 
-introduction = character_data.get("introduction", [])
-
-bio_str = "\n".join(bio_list)
-lore_str = "\n".join(lore_list)
-knowledge_str = "\n".join(knowledge) if isinstance(knowledge, list) else str(knowledge)
-topics_str = "\n".join(topics)
-adjectives_str = ", ".join(adjectives)
-
-style_all_list = style_info.get("all", [])
-style_chat_list = style_info.get("chat", [])
-style_all_str = "\n".join(style_all_list)
-style_chat_str = "\n".join(style_chat_list)
-
-OPENROUTER_API_KEY = character_data.get("OPENROUTER_API_KEY", [])
-BOT_TOKEN = character_data.get("BOT_TOKEN", [])
+if not OPENROUTER_API_KEY or not BOT_TOKEN:
+    logging.error("Missing API key or bot token. Check character.json or environment variables.")
+    exit(1)
 
 OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
-
-# ----------------------------System Prompt-----------------------------
+# System prompt
 SYSTEM_PROMPT = f"""
 You are {bot_name}, a crypto project focusing on security and transparency.
 
 === BIO ===
-{bio_str}
+{character_data.get('bio', '')}
 
 === LORE ===
-{lore_str}
+{character_data.get('lore', '')}
 
 === TOPICS ===
-{topics_str}
+{character_data.get('topics', '')}
 
 === KNOWLEDGE ===
-{knowledge_str}
-
-=== STYLE (ALL) ===
-{style_all_str}
-
-=== STYLE (CHAT) ===
-{style_chat_str}
-
-=== ADJECTIVES ===
-{adjectives_str}
+{character_data.get('knowledge', '')}
 
 Rules:
 1. Provide factual answers based on the info above.
@@ -84,28 +52,28 @@ Rules:
 4. Answer in a friendly and concise manner, unless the user asks for more detail.
 """
 
-# ----------------------------START----------------------------
-async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    message = update.message
-    if not message:
+intents = discord.Intents.default()
+intents.messages = True
+intents.message_content = True
+client = discord.Client(intents=intents)
+
+@client.event
+async def on_ready():
+    logging.info(f"Bot {client.user} is now running.")
+
+@client.event
+async def on_message(message):
+    if message.author == client.user:
         return
 
-    user_text = message.text
-    user_name = update.effective_user.full_name if update.effective_user else "Unknown User"
-    user_id = update.effective_user.id if update.effective_user else "Unknown ID"
-    chat_id = update.effective_chat.id
-    chat_type = update.effective_chat.type
-    
-    bot_username = (await context.bot.get_me()).username
+    user_text = message.content
+    should_respond = False
 
-    if not bot_username:
-        logging.error("Bot username error.")
-        return
-
-    if chat_type == Chat.PRIVATE:
+    if isinstance(message.channel, discord.DMChannel):
         should_respond = True
-    else:
-        should_respond = f"@{bot_username.lower()}" in user_text.lower()
+    elif client.user.mentioned_in(message):
+        should_respond = True
+        user_text = user_text.replace(f"<@{client.user.id}>", "").strip()
 
     if not should_respond:
         return
@@ -116,13 +84,12 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user_text}
         ],
-        "max_tokens": 500,  #  К-кість токенів
-        "temperature": 0.3  # Креативність
+        "max_tokens": 500,
+        "temperature": 0.3
     }
     headers = {
         "Content-Type": "application/json",
-        "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-        "HTTP-Referer": "https://my-cool-project.com"
+        "Authorization": f"Bearer {OPENROUTER_API_KEY}"
     }
 
     try:
@@ -130,33 +97,27 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         response.raise_for_status()
         data = response.json()
         gpt_answer = data["choices"][0]["message"]["content"]
-    except Exception as e:
+    except requests.exceptions.RequestException as e:
         logging.error(f"OpenRouter API error: {e}")
         gpt_answer = "Sorry, an error occurred while fetching data from OpenRouter."
+    except KeyError:
+        logging.error("Unexpected response structure from OpenRouter API.")
+        gpt_answer = "Sorry, I couldn't process the request properly."
 
-    await message.reply_text(gpt_answer)
+    await message.channel.send(gpt_answer)
+
 
     time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-
     log_line = (
-        
         f"\n\n{time}\n"
-        f"In chat: {chat_id} (type: {chat_type})\n"
-        f"User: {user_name} (ID: {user_id})\n"
+        f"In channel: {message.channel} (type: {'DM' if isinstance(message.channel, discord.DMChannel) else 'Server'})\n"
+        f"User: {message.author} (ID: {message.author.id})\n"
         f"Message: {user_text}\n"
         f"Bot Reply: {gpt_answer}\n"
     )
-
     logging.info(str(log_line))
 
-async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(introduction)
-
-def main():
-    application = ApplicationBuilder().token(BOT_TOKEN).build()
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
-    application.add_handler(CommandHandler('start', start_handler))
-    application.run_polling()
-
-if __name__ == "__main__":
-    main()
+try:
+    client.run(BOT_TOKEN)
+except discord.LoginFailure:
+    logging.error("Invalid BOT_TOKEN. Please check your configuration.")
