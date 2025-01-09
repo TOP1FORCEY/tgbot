@@ -1,2 +1,2 @@
-discrod
+discord.py
 requests
