@@ -21,7 +21,7 @@ except FileNotFoundError:
 bot_name = character_data.get("name", "CryptoBot")
 introduction = character_data.get("introduction", "Hello! I am here to assist you.")
 OPENROUTER_API_KEY = character_data.get("OPENROUTER_API_KEY", os.getenv("OPENROUTER_API_KEY", ""))
-BOT_TOKEN = "MTMyNzAwNjM3OTIwMTkyMTAzNA.Gox9MR.y9QQyZ-" + "1q_ffojapA0QHNWvLfGo83KH1U-Q8YA"
+BOT_TOKEN = "MTMyNzI3NTQwNjIxNDAzNzUxNA.GQGXcG.ECx7yno2KqkZ" + "cLPUg5LIpuMcy_YgZ9dy5o-C1c"
 
 if not OPENROUTER_API_KEY or not BOT_TOKEN:
     logging.error("Missing API key or bot token. Check character.json or environment variables.")
@@ -31,7 +31,7 @@ OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 # System prompt
 SYSTEM_PROMPT = f"""
-You are {bot_name}, a crypto project focusing on security and transparency.
+You are {bot_name}.
 
 === BIO ===
 {character_data.get('bio', '')}
