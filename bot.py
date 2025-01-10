@@ -18,7 +18,7 @@ except FileNotFoundError:
     logging.warning(f"File {JSON_FILE} is missing!")
 
 # Bot configuration
-bot_name = character_data.get("name", "CryptoBot")
+bot_name = character_data.get("name", "Bot")
 introduction = character_data.get("introduction", "Hello! I am here to assist you.")
 OPENROUTER_API_KEY = character_data.get("OPENROUTER_API_KEY", os.getenv("OPENROUTER_API_KEY", ""))
 BOT_TOKEN = "MTMyNzI3NTQwNjIxNDAzNzUxNA.GQGXcG.ECx7yno2KqkZ" + "cLPUg5LIpuMcy_YgZ9dy5o-C1c"
