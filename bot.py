@@ -34,6 +34,8 @@ style_info = character_data.get("style", {})
 adjectives = character_data.get("adjectives", [])
 
 introduction = character_data.get("introduction", [])
+buy_text = character_data.get("buy_text", [])
+info_text = character_data.get("info_text", [])
 
 bio_str = "\n".join(bio_list)
 lore_str = "\n".join(lore_list)
@@ -149,13 +151,22 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     logging.info(str(log_line))
 
-async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(introduction)
+async def command_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    messege = update.message.text
+    
+    print(messege)
+
+    if messege == "/start":
+        await update.message.reply_text(introduction)
+    elif messege == "/buy":
+        await update.message.reply_text(buy_text)
+    elif messege == "/info":
+        await update.message.reply_text(info_text)
 
 def main():
     application = ApplicationBuilder().token(BOT_TOKEN).build()
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_text))
-    application.add_handler(CommandHandler('start', start_handler))
+    application.add_handler(CommandHandler(['start','buy','info'], command_handler))
     application.run_polling()
 
 if __name__ == "__main__":
