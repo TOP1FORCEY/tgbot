@@ -1,4 +1,3 @@
-import os
 import json
 import requests
 import logging
@@ -27,6 +26,7 @@ except FileNotFoundError:
 
 bot_name = character_data.get("name", [])
 clients = character_data.get("clients", [])
+bio_list = character_data.get("task", [])
 bio_list = character_data.get("bio", [])
 lore_list = character_data.get("lore", [])
 knowledge = character_data.get("knowledge", [])
@@ -36,6 +36,7 @@ adjectives = character_data.get("adjectives", [])
 
 introduction = character_data.get("introduction", [])
 
+task_str = "\n".join(bio_list)
 bio_str = "\n".join(bio_list)
 lore_str = "\n".join(lore_list)
 knowledge_str = "\n".join(knowledge) if isinstance(knowledge, list) else str(knowledge)
@@ -56,6 +57,9 @@ OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 # ----------------------------System Prompt-----------------------------
 SYSTEM_PROMPT = f"""
 You are {bot_name}, a crypto project focusing on security and transparency.
+
+=== TASK ===
+{task_str}
 
 === BIO ===
 {bio_str}
