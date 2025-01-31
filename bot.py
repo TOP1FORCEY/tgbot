@@ -62,7 +62,8 @@ You are {bot_name}.
 === TASK ===
 {task_str}
 
-=== LINKS ===
+=== LINKS === SEND ONLY LINK ITSELF!, NO () OR [] EXAMPLE: Ось посилання на наш: ... === LINKS ===
+
 {links_str}
 
 === BIO ===
