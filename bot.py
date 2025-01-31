@@ -25,8 +25,8 @@ except FileNotFoundError:
     logging.warning(f"Файл {JSON_FILE} відсутній!")
 
 bot_name = character_data.get("name", [])
-clients = character_data.get("clients", [])
-bio_list = character_data.get("task", [])
+links_list = character_data.get("links", [])
+task_list = character_data.get("task", [])
 bio_list = character_data.get("bio", [])
 lore_list = character_data.get("lore", [])
 knowledge = character_data.get("knowledge", [])
@@ -36,8 +36,9 @@ adjectives = character_data.get("adjectives", [])
 
 introduction = character_data.get("introduction", [])
 
-task_str = "\n".join(bio_list)
+task_str = "\n".join(task_list)
 bio_str = "\n".join(bio_list)
+links_str = "\n".join(links_list)
 lore_str = "\n".join(lore_list)
 knowledge_str = "\n".join(knowledge) if isinstance(knowledge, list) else str(knowledge)
 topics_str = "\n".join(topics)
@@ -56,10 +57,13 @@ OPENROUTER_API_URL = "https://openrouter.ai/api/v1/chat/completions"
 
 # ----------------------------System Prompt-----------------------------
 SYSTEM_PROMPT = f"""
-You are {bot_name}, a crypto project focusing on security and transparency.
+You are {bot_name}.
 
 === TASK ===
 {task_str}
+
+=== LINKS ===
+{links_str}
 
 === BIO ===
 {bio_str}
@@ -88,6 +92,8 @@ Rules:
 3. Follow the style guidelines: speak in a clear, transparent tone and greet users warmly.
 4. Answer in a friendly and concise manner, unless the user asks for more detail.
 """
+
+print(SYSTEM_PROMPT)
 
 # ----------------------------START----------------------------
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):

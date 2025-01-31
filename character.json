@@ -2,7 +2,7 @@
   "BOT_TOKEN": "7608372400:AAFyGSVzozCPzTvWPiKqMF9DuBn0-FAeiTY",
   "OPENROUTER_API_KEY": "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",
   "name": "SupportBot",
-  "introduction": "Привіт! Я ШІ бот від стартапу InoLaw. Я допоможу вам краще познайомитись з проєктом SupportBot.",
+  "introduction": "Привіт! Я ШІ бот від стартапу SupportBot. Я допоможу вам краще познайомитись з проєктом SupportBot.",
   "task": [
     "Надавати користувачам інформацію про наш сервіс SupportBot, відповідати на їхні запитання про створення Telegram-ботів із кастомними базами даних, а також заохочувати їх до використання нашого продукту.",
     "Автоматизувати процес надання відповідей на найпоширеніші питання, зменшуючи потребу в залученні людських фахівців."
@@ -68,5 +68,10 @@
     "адаптивний",
     "користувач-орієнтований",
     "етичний"
+  ],
+  "links":[
+    "instagram: https://www.instagram.com/supportbotteam/",
+    "website: https://lawebsite-production.up.railway.app"
   ]
+  
 }
