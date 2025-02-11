@@ -94,8 +94,6 @@ Rules:
 4. Answer in a friendly and concise manner, unless the user asks for more detail.
 """
 
-print(SYSTEM_PROMPT)
-
 # ----------------------------START----------------------------
 async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
     message = update.message
@@ -159,7 +157,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
         f"Bot Reply: {gpt_answer}\n"
     )
 
-    logging.info(str(log_line))
+    print(str(log_line))
 
 async def start_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(introduction)
