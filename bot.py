@@ -11,6 +11,10 @@ from telegram.ext import (
     ContextTypes
 )
 
+logging.basicConfig(
+    level=logging.INFO
+)
+
 JSON_FILE = "character.json"
 try:
     with open(JSON_FILE, "r", encoding="utf-8") as f:
