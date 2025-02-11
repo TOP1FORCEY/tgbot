@@ -150,7 +150,7 @@ async def handle_text(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     log_line = (
         
-        f"\n\n{time}\n"
+        f"{time}\n"
         f"In chat: {chat_id} (type: {chat_type})\n"
         f"User: {user_name} (ID: {user_id})\n"
         f"Message: {user_text}\n"
